@@ -24,8 +24,8 @@ def analyze_market(candle_data: CandleList):
         return {"error": "Need at least 10 candles for analysis"}
 
     last = candles[-1]
-    recent_highs = [c.high for c in candles[-5:]]
-    recent_lows = [c.low for c in candles[-5:]]
+    recent_highs = [c.high for c in candles[-8:]]  # More reliable range
+    recent_lows = [c.low for c in candles[-8:]]
 
     support = min(recent_lows)
     resistance = max(recent_highs)
@@ -37,11 +37,10 @@ def analyze_market(candle_data: CandleList):
     stop_loss = None
     take_profit = None
 
-    # Break-Up Structure
+    # Break-Up Structure with buffer
     if last.close >= resistance - 0.1:
         structure = "Break-Up"
         suggestion = "Wait for pullback to demand zone"
-        # Get last bullish candle before breakout
         last_bullish = next((c for c in reversed(candles[:-1]) if c.close > c.open), None)
         if last_bullish:
             demand_zone = {"high": last_bullish.high, "low": last_bullish.low}
@@ -49,12 +48,12 @@ def analyze_market(candle_data: CandleList):
             stop_loss = round(last_bullish.low, 2)
             take_profit = round(last.high, 2)
 
-    # Liquidation Phase
+    # Liquidation Structure
     elif last.close < support:
         structure = "Liquidation"
         suggestion = "Watch for reversal signs (MSS)"
 
-    # Market Structure Shift
+    # Market Structure Shift (MSS)
     elif last.low < candles[-2].low and last.high > candles[-2].high:
         structure = "Market Structure Shift (MSS)"
         suggestion = "Look for entry after confirmation"
