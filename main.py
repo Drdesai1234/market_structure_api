@@ -38,7 +38,7 @@ def analyze_market(candle_data: CandleList):
     take_profit = None
 
     # Break-Up Structure
-    if last.close > resistance:
+    if last.close >= resistance - 0.1:
         structure = "Break-Up"
         suggestion = "Wait for pullback to demand zone"
         # Get last bullish candle before breakout
